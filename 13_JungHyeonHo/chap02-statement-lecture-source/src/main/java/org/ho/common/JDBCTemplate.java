@@ -1,10 +1,8 @@
-package org.ho.section02.template;
+package org.ho.common;
 
 import java.io.FileReader;
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.Properties;
 
 /* 반복되는 JDBC 관련 코드를 미리 작성해서
@@ -15,7 +13,7 @@ public class JDBCTemplate {
     Connection conn = null;
 
     try {
-      prop.load(new FileReader("src/main/java/org/ho/section01/connection/jdbc-config.properites"));
+      prop.load(new FileReader("src/main/java/org/ho/config/jdbc-config.properties"));
 
       // properties 파일에서 읽어온 데이터를 key를 통해 얻어옴
       String url = prop.getProperty("url"); //url스킴으로 mysql인지 확인
@@ -50,4 +48,26 @@ public class JDBCTemplate {
       throw new RuntimeException(e);
     }
   }
+
+  /* 순서가 중요하다! */
+  // 1. Connection을 먼저 지우면 Statement와 ResultSet이 이동중이었다면
+  // 2. Statement와 ResultSet에는 문제가 발생
+  // 3. 그러므로 2개를 먼저 close해준 후에 Connection을 close한다
+  public static void close(Statement stmt){
+    try {
+      if(stmt!=null && !stmt.isClosed())stmt.close();
+    } catch (SQLException e) {
+      throw new RuntimeException(e);
+    }
+  }
+  public static void close(ResultSet rset){
+    try {
+      if(rset!=null && !rset.isClosed())rset.close();
+    } catch (SQLException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+
+
 }

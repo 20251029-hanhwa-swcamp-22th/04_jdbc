@@ -1,11 +1,13 @@
-package org.ho.section01.statement;
+package org.ho.section03.sqlinjection;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-import static org.ho.common.JDBCTemplate.*;
+import static org.ho.common.JDBCTemplate.close;
+import static org.ho.common.JDBCTemplate.getConnection;
+
 public class Application1 {
   public static void main(String[] args) {
 
@@ -18,7 +20,12 @@ public class Application1 {
       /* Statement : 쿼리를 운반하고 결과를 반환하는 객체 */
       stmt = conn.createStatement();
 
-      String sql = "select * from tbl_menu";
+      int menuCode = 16;
+      String menuName = "' or 1=1 or 1='";
+
+      // 홑따옴표(')를 처리하는데 내부에 값이 확실히 들어가는지 장담할 수 없다.=>SQL Injection 위험
+      String sql = "select * from tbl_menu where menu_code = "+menuCode
+          +" and menu_name = "+"'"+menuName+"'";
 
       // executeQuery() : SELECT 수행 후 ResultSet 반환
       /* ResultSet : SELECT 결과를 다루는 객체(1행씩) */
